@@ -41,10 +41,10 @@
 #include <string.h>
 
 
-void timer_start(mtimer_t *timer)
+void mtimer_start(mtimer_t *timer)
 {
     if(!timer) {
-        printf("( error ) timer is NULL ->  ms_timer_start()");
+        printf("( error ) timer is NULL ->  ms_mtimer_start()");
         return;
     }
 
@@ -53,7 +53,7 @@ void timer_start(mtimer_t *timer)
     clock_gettime(CLOCK_MONOTONIC, &(timer->tstart));
 }
 
-mtime_diff_t timer_end(mtimer_t *timer)
+mtime_diff_t mtimer_end(mtimer_t *timer)
 {
     mtime_diff_t diff;
 
@@ -61,7 +61,7 @@ mtime_diff_t timer_end(mtimer_t *timer)
     diff.msec = 0;
 
     if(!timer) {
-        printf("( error ) timer is NULL ->  ms_timer_start()");
+        printf("( error ) timer is NULL ->  ms_mtimer_start()");
         return diff;
     }
     clock_gettime(CLOCK_MONOTONIC, &timer->tend);
@@ -79,9 +79,9 @@ int main()
     mtimer_t timer;
     mtime_diff_t diff;
 
-    timer_start(&timer);
+    mtimer_start(&timer);
     usleep(1100 * 1000);
-    diff = timer_end(&timer);
+    diff = mtimer_end(&timer);
 
     printf("diff_sec  = %d\n", (int)diff.sec);
     printf("diff_msec = %d\n", (int)diff.msec);

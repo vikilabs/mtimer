@@ -45,4 +45,6 @@ typedef struct{
     long   msec;  /*milli seconds*/
 }mtime_diff_t;
 
+extern void mtimer_start(mtimer_t *timer);
+extern mtime_diff_t mtimer_end(mtimer_t *timer);
 #endif
