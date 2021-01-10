@@ -36,15 +36,19 @@
 #ifndef MTIMER_T
 #define MTIMER_T
 #include <time.h>
-typedef struct{
-    struct timespec tstart, tend; 
-}mtimer_t;
 
-typedef struct{
+struct mtime_diff_t{
     time_t sec;   /*seconds*/ 
     long   msec;  /*milli seconds*/
-}mtime_diff_t;
+};
+
+typedef struct{
+    int on;
+    struct timespec tstart, tend; 
+    struct mtime_diff_t diff;
+}mtimer_t;
+
 
 extern void mtimer_start(mtimer_t *timer);
-extern mtime_diff_t mtimer_end(mtimer_t *timer);
+extern void mtimer_end(mtimer_t *timer);
 #endif

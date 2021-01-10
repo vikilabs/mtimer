@@ -50,41 +50,47 @@ void mtimer_start(mtimer_t *timer)
 
     memset(&(timer->tstart), 0x0, sizeof(struct timespec)); 
     memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
+    memset(&(timer->diff)  , 0x0, sizeof(struct mtime_diff_t)); 
     clock_gettime(CLOCK_MONOTONIC, &(timer->tstart));
+
+    timer->on = 1;
 }
 
-mtime_diff_t mtimer_end(mtimer_t *timer)
+void mtimer_end(mtimer_t *timer)
 {
-    mtime_diff_t diff;
-
-    diff.sec = 0;
-    diff.msec = 0;
-
     if(!timer) {
         printf("( error ) timer is NULL ->  ms_mtimer_start()");
-        return diff;
+        return;
     }
+
+    if(timer->on == 0){
+        memset(&(timer->tstart), 0x0, sizeof(struct timespec)); 
+        memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
+        timer->diff.msec = 0;         
+        timer->diff.sec = 0; 
+        return;        
+    }
+
     clock_gettime(CLOCK_MONOTONIC, &timer->tend);
 
-    diff.msec = (timer->tend.tv_nsec - timer->tstart.tv_nsec)/1000000;
-    diff.sec  = timer->tend.tv_sec - timer->tstart.tv_sec; 
+    timer->diff.msec = (timer->tend.tv_nsec - timer->tstart.tv_nsec)/1000000;
+    timer->diff.sec  = timer->tend.tv_sec - timer->tstart.tv_sec; 
     memset(&(timer->tstart), 0x0, sizeof(struct timespec)); 
     memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
-    return diff;
+    timer->on = 0;
 }
 
 #if 0 //TEST CODE
 int main()
 {
     mtimer_t timer;
-    mtime_diff_t diff;
 
     mtimer_start(&timer);
     usleep(1100 * 1000);
-    diff = mtimer_end(&timer);
+    mtimer_end(&timer);
 
-    printf("diff_sec  = %d\n", (int)diff.sec);
-    printf("diff_msec = %d\n", (int)diff.msec);
+    printf("diff_sec  = %d\n", (int)timer.diff.sec);
+    printf("diff_msec = %d\n", (int)timer.diff.msec);
 
 }
 #endif
