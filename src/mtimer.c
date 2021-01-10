@@ -75,6 +75,10 @@ void mtimer_end(mtimer_t *timer)
 
     timer->diff.msec = (timer->tend.tv_nsec - timer->tstart.tv_nsec)/1000000;
     timer->diff.sec  = timer->tend.tv_sec - timer->tstart.tv_sec; 
+
+    if( timer->diff.sec < 0 ) timer->diff.sec = 0;
+    if( timer->diff.msec < 0) timer->diff.msec = 0;
+
     memset(&(timer->tstart), 0x0, sizeof(struct timespec)); 
     memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
     timer->on = 0;
