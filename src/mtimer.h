@@ -51,4 +51,5 @@ typedef struct{
 
 extern void mtimer_start(mtimer_t *timer);
 extern void mtimer_end(mtimer_t *timer);
+extern void mtimer_clear(mtimer_t *timer);
 #endif

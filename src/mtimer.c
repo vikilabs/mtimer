@@ -44,7 +44,7 @@
 void mtimer_start(mtimer_t *timer)
 {
     if(!timer) {
-        printf("( error ) timer is NULL ->  ms_mtimer_start()");
+        printf("( error ) timer is NULL ->  mtimer_start()");
         return;
     }
 
@@ -59,7 +59,7 @@ void mtimer_start(mtimer_t *timer)
 void mtimer_end(mtimer_t *timer)
 {
     if(!timer) {
-        printf("( error ) timer is NULL ->  ms_mtimer_start()");
+        printf("( error ) timer is NULL ->  mtimer_end()");
         return;
     }
 
@@ -80,6 +80,21 @@ void mtimer_end(mtimer_t *timer)
     timer->on = 0;
 }
 
+void mtimer_clear(mtimer_t *timer)
+{
+    if(!timer) {
+        printf("( error ) timer is NULL ->  mtimer_clear()");
+        return;
+    }
+
+    memset(&(timer->tstart), 0x0, sizeof(struct timespec)); 
+    memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
+    memset(&(timer->diff)  , 0x0, sizeof(struct mtime_diff_t)); 
+
+    timer->on = 0;
+}
+
+
 #if 0 //TEST CODE
 int main()
 {
@@ -91,6 +106,9 @@ int main()
 
     printf("diff_sec  = %d\n", (int)timer.diff.sec);
     printf("diff_msec = %d\n", (int)timer.diff.msec);
-
+    
+    mtimer_clear(&timer);
+    printf("diff_sec  = %d\n", (int)timer.diff.sec);
+    printf("diff_msec = %d\n", (int)timer.diff.msec);
 }
 #endif
