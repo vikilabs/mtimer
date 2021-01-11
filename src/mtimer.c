@@ -56,6 +56,22 @@ void mtimer_start(mtimer_t *timer)
     timer->on = 1;
 }
 
+void mtimer_reset(mtimer_t *timer)
+{
+    if(!timer) {
+        printf("( error ) timer is NULL ->  mtimer_start()");
+        return;
+    }
+
+    memset(&(timer->tstart), 0x0, sizeof(struct timespec)); 
+    memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
+    memset(&(timer->diff)  , 0x0, sizeof(struct mtime_diff_t)); 
+    clock_gettime(CLOCK_MONOTONIC, &(timer->tstart));
+
+    timer->on = 1;
+}
+
+
 void mtimer_end(mtimer_t *timer)
 {
     if(!timer) {
@@ -84,6 +100,33 @@ void mtimer_end(mtimer_t *timer)
     timer->on = 0;
 }
 
+void mtimer_elapsed(mtimer_t *timer)
+{
+    if(!timer) {
+        printf("( error ) timer is NULL ->  mtimer_end()");
+        return;
+    }
+
+    if(timer->on == 0){
+        memset(&(timer->tstart), 0x0, sizeof(struct timespec)); 
+        memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
+        timer->diff.msec = 0;         
+        timer->diff.sec = 0; 
+        return;        
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &timer->tend);
+
+    timer->diff.msec = (timer->tend.tv_nsec - timer->tstart.tv_nsec)/1000000;
+    timer->diff.sec  = timer->tend.tv_sec - timer->tstart.tv_sec; 
+
+    if( timer->diff.sec < 0 ) timer->diff.sec = 0;
+    if( timer->diff.msec < 0) timer->diff.msec = 0;
+
+    memset(&(timer->tend)  , 0x0, sizeof(struct timespec)); 
+}
+
+
 void mtimer_clear(mtimer_t *timer)
 {
     if(!timer) {
@@ -105,14 +148,27 @@ int main()
     mtimer_t timer;
 
     mtimer_start(&timer);
-    usleep(1100 * 1000);
-    mtimer_end(&timer);
+    usleep(1 * 1000);
+    mtimer_elapsed(&timer);
+    printf("elapsed ( %d.%d seconds )\n", (int)timer.diff.sec, (int)timer.diff.msec);
+    usleep(1 * 1000);
+    mtimer_elapsed(&timer);
+    printf("elapsed ( %d.%d seconds )\n", (int)timer.diff.sec, (int)timer.diff.msec);
+    usleep(1 * 1000);
+    mtimer_elapsed(&timer);
+    printf("elapsed ( %d.%d seconds )\n", (int)timer.diff.sec, (int)timer.diff.msec);
 
-    printf("diff_sec  = %d\n", (int)timer.diff.sec);
-    printf("diff_msec = %d\n", (int)timer.diff.msec);
+    mtimer_end(&timer);
+    printf("end diff ( %d.%d seconds )\n", (int)timer.diff.sec, (int)timer.diff.msec);
+    
+    mtimer_reset(&timer);
+    usleep(1 * 1000);
+    mtimer_end(&timer);
+    printf("reset diff ( %d.%d seconds )\n", (int)timer.diff.sec, (int)timer.diff.msec);
+
+    printf("diff ( %d.%d seconds )\n", (int)timer.diff.sec, (int)timer.diff.msec);
     
     mtimer_clear(&timer);
-    printf("diff_sec  = %d\n", (int)timer.diff.sec);
-    printf("diff_msec = %d\n", (int)timer.diff.msec);
+    printf("clear ( %d.%d seconds )\n", (int)timer.diff.sec, (int)timer.diff.msec);
 }
 #endif
